@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import ToastProvider from "@/context/ToastProvider";
+import { CategoriesProvider } from "@/context/CategoriesContext";
 import ShopHeader from "@/components/ShopHeader";
 import Sidebar from "@/components/Sidebar";
 
@@ -15,12 +16,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen antialiased">
         <CartProvider>
-          <ToastProvider />
-          <ShopHeader />
-          <div className="flex">
-            <Sidebar />
-            <main className="flex-1 lg:ml-60">{children}</main>
-          </div>
+          <CategoriesProvider>
+            <ToastProvider />
+            {/* Fixed header — pinned to top:0, no gap */}
+            <ShopHeader />
+            {/* Spacer pushes content below the fixed header */}
+            <div style={{ height: "var(--header-h)" }} />
+            {/* Body row */}
+            <div className="flex min-h-[calc(100vh-var(--header-h))]">
+              <Sidebar />
+              <main className="flex-1 lg:ml-[260px] min-w-0">{children}</main>
+            </div>
+          </CategoriesProvider>
         </CartProvider>
       </body>
     </html>

@@ -2,7 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Layout constants ── */
+:root {
+  --header-h: 110px; /* 70px top bar + 40px secondary nav */
+}
+
+/* ── Hard reset — no gap above header ── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ── Base surface ── */
+body {
+  @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+  transition: background-color 0.2s, color 0.2s;
+}
+
 /* ── Shimmer skeleton ── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
 @layer utilities {
   .skeleton {
     @apply rounded-lg bg-gray-200 dark:bg-gray-700;
@@ -25,11 +45,6 @@
   }
 }
 
-/* ── Smooth scrolling ── */
-html { scroll-behavior: smooth; }
-
-/* ── Base dark surface ── */
-body {
-  @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
-  transition: background-color 0.2s, color 0.2s;
-}
+/* ── Hide scrollbar ── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
