@@ -127,7 +127,7 @@ export default function GiftCardShopPage() {
         </div>
         <div className="relative mx-auto max-w-[1400px] px-6 py-16 text-center text-white">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <span className="mb-3 inline-block rounded-full bg-orange-500/20 border border-orange-500/40 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-orange-400">
+            <span className="mb-3 inline-block rounded-full bg-brand-100 border border-brand-200 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-brand-700">
               🎁 Gift Card Shop
             </span>
             <h1 className="mt-3 text-4xl font-extrabold leading-tight md:text-5xl">
@@ -140,7 +140,7 @@ export default function GiftCardShopPage() {
             {/* Action buttons */}
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               {[
-                { icon: "🎁", label: "Redeem a gift card", style: "bg-orange-500 hover:bg-orange-600 text-white" },
+                { icon: "🎁", label: "Redeem a gift card", style: "bg-brand-600 hover:bg-brand-700 text-white" },
                 { icon: "💰", label: "View your balance", style: "bg-white/10 hover:bg-white/20 text-white border border-white/20" },
                 { icon: "🔄", label: "Reload", style: "bg-white/10 hover:bg-white/20 text-white border border-white/20" },
               ].map((btn) => (
@@ -164,8 +164,8 @@ export default function GiftCardShopPage() {
                   onClick={() => setSelectedAmount(amt)}
                   className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
                     selectedAmount === amt
-                      ? "border-orange-500 bg-orange-500 text-white"
-                      : "border-white/30 text-white hover:border-orange-400"
+                      ? "border-brand-600 bg-brand-600 text-white"
+                      : "border-gray-300 text-gray-700 hover:border-brand-400 hover:text-brand-600"
                   }`}
                 >
                   {amt}
@@ -265,7 +265,7 @@ export default function GiftCardShopPage() {
                       <p className="font-semibold text-gray-900 dark:text-gray-100">{occ.label}</p>
                       <p className="text-xs text-gray-400">Gift cards</p>
                     </div>
-                    <svg className="h-4 w-4 text-gray-400 group-hover:text-orange-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-4 w-4 text-gray-400 group-hover:text-brand-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
@@ -299,7 +299,7 @@ export default function GiftCardShopPage() {
                   </div>
                   <div className="px-3 py-2 text-center">
                     <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{brand.name}</p>
-                    <p className="text-xs text-orange-500 group-hover:underline">Shop now</p>
+                    <p className="text-xs text-brand-600 group-hover:underline">Shop now</p>
                   </div>
                 </Link>
               </motion.div>
@@ -314,7 +314,7 @@ export default function GiftCardShopPage() {
               <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Featured Products</h2>
               <p className="text-sm text-gray-400">Live from our store</p>
             </div>
-            <Link href="/products" className="text-sm font-semibold text-orange-500 hover:underline">
+            <Link href="/products" className="text-sm font-semibold text-brand-600 hover:underline">
               View all →
             </Link>
           </div>
@@ -352,14 +352,14 @@ export default function GiftCardShopPage() {
                     <div className="p-3">
                       <p className="text-xs text-gray-400">{product.category?.name}</p>
                       <p className="truncate text-sm font-semibold text-gray-800 dark:text-gray-100">{product.name}</p>
-                      <p className="mt-1 text-base font-bold text-orange-500">${Number(product.price).toFixed(2)}</p>
+                      <p className="mt-1 text-base font-bold text-brand-600">${Number(product.price).toFixed(2)}</p>
                     </div>
                   </Link>
                   <div className="px-3 pb-3">
                     <button
                       onClick={() => handleAddToCart(product)}
                       disabled={addingId === product.id}
-                      className="w-full rounded-xl bg-orange-500 py-2 text-sm font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60"
+                      className="w-full rounded-xl bg-brand-600 py-2 text-sm font-semibold text-white hover:bg-brand-700 transition disabled:opacity-60"
                     >
                       {addingId === product.id ? "Adding..." : "Add to Cart"}
                     </button>
@@ -412,7 +412,7 @@ export default function GiftCardShopPage() {
             <div className="mt-5 flex flex-wrap justify-center gap-3">
               <motion.button
                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                className="rounded-full bg-orange-500 px-8 py-3 font-semibold hover:bg-orange-600 transition shadow-lg"
+                className="rounded-full bg-brand-600 px-8 py-3 font-semibold hover:bg-brand-700 transition shadow-lg"
               >
                 Buy a gift card
               </motion.button>

@@ -21,6 +21,11 @@ from django.conf.urls.static import static
 
 from accounts.dashboard_views import AdminDashboardAPIView
 
+# ── Admin site branding ───────────────────────────────────────────────────────
+admin.site.site_header  = "Ethio eCommerce Admin"
+admin.site.site_title   = "Ethio eCommerce"
+admin.site.index_title  = "Platform Control Panel"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),
@@ -30,6 +35,7 @@ urlpatterns = [
     path('api/', include('purchases.urls')),
     path('api/', include('payments.urls')),
     path('api/', include('logistics.urls')),
+    path('api/', include('chat.urls')),
 ]
 
 if settings.DEBUG:

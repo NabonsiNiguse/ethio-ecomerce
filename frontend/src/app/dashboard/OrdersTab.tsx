@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import api from "@/lib/axios";
-import { Order } from "@/types";
+import { Order, Delivery } from "@/types";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
@@ -21,9 +21,30 @@ const STATUS_ICONS: Record<string, string> = {
   pending: "⏳", paid: "✅", shipped: "🚚", delivered: "📦", cancelled: "❌",
 };
 
+const DELIVERY_BADGE: Record<string, string> = {
+  pending:   "bg-yellow-50 text-yellow-600",
+  assigned:  "bg-blue-50 text-blue-600",
+  picked:    "bg-purple-50 text-purple-600",
+  delivered: "bg-green-50 text-green-600",
+};
+
 export default function OrdersTab({ orders }: { orders: Order[] }) {
   const [expanded, setExpanded] = useState<number | null>(null);
   const [paying, setPaying] = useState<number | null>(null);
+  const [deliveries, setDeliveries] = useState<Record<number, Delivery>>({});
+
+  useEffect(() => {
+    const paidOrders = orders.filter((o) => o.status !== "pending" && o.status !== "cancelled");
+    Promise.all(
+      paidOrders.map((o) =>
+        api.get<Delivery>(`/api/delivery/order/${o.id}`).then((r) => ({ id: o.id, data: r.data })).catch(() => null)
+      )
+    ).then((results) => {
+      const map: Record<number, Delivery> = {};
+      results.forEach((r) => { if (r) map[r.id] = r.data; });
+      setDeliveries(map);
+    });
+  }, [orders]);
 
   const handlePayNow = async (orderId: number) => {
     setPaying(orderId);
@@ -92,6 +113,12 @@ export default function OrdersTab({ orders }: { orders: Order[] }) {
                   <span className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold capitalize ${STATUS_STYLES[order.status] ?? "bg-gray-100 text-gray-600"}`}>
                     {STATUS_ICONS[order.status]} {order.status}
                   </span>
+                  {deliveries[order.id] && (
+                    <span className={`rounded-full px-2 py-1 text-xs font-semibold capitalize ${DELIVERY_BADGE[deliveries[order.id].status] ?? ""}`}>
+                      🚚 {deliveries[order.id].status}
+                      {deliveries[order.id].delivery_fee > 0 && ` · ${deliveries[order.id].delivery_fee} ETB`}
+                    </span>
+                  )}
                   <span className="text-sm font-black text-orange-500">
                     ${Number(order.total_price).toFixed(2)}
                   </span>
@@ -128,6 +155,14 @@ export default function OrdersTab({ orders }: { orders: Order[] }) {
                     >
                       {isExpanded ? "Hide" : "Show"} shipping info
                     </button>
+                  )}
+                  {order.status !== "pending" && order.status !== "cancelled" && (
+                    <a
+                      href={`/chat/order_${order.id}`}
+                      className="text-xs font-semibold text-blue-500 hover:underline"
+                    >
+                      💬 Chat
+                    </a>
                   )}
                 </div>
                 <div className="flex items-center gap-2">

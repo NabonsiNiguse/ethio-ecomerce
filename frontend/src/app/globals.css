@@ -1,50 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Layout constants ── */
+/* ── CSS variables ── */
 :root {
-  --header-h: 110px; /* 70px top bar + 40px secondary nav */
+  --header-h: 118px; /* 70px top + 48px subnav */
+  --sidebar-w: 260px;
 }
 
-/* ── Hard reset — no gap above header ── */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
-/* ── Base surface ── */
 body {
-  @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
-  transition: background-color 0.2s, color 0.2s;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ── Shimmer skeleton ── */
 @keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position:  400px 0; }
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
 }
+
+/* ── Chat product banner shimmer ── */
+@keyframes chatShimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes waterFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes borderGlow {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* Product banner in chat — animated water-blue */
+.product-banner-bg {
+  background: linear-gradient(135deg, #0c4a6e, #0369a1, #0284c7, #0ea5e9, #38bdf8, #0ea5e9, #0284c7, #0369a1);
+  background-size: 300% 300%;
+  animation: waterFlow 4s ease infinite;
+}
+
+.product-banner-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: chatShimmer 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.product-banner-border {
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1.5px rgba(125, 211, 252, 0.6), 0 0 20px rgba(14, 165, 233, 0.4);
+  animation: borderGlow 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
 @layer utilities {
   .skeleton {
-    @apply rounded-lg bg-gray-200 dark:bg-gray-700;
-    background-image: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255,255,255,0.35) 50%,
-      transparent 100%
-    );
-    background-size: 400px 100%;
-    animation: shimmer 1.4s ease-in-out infinite;
+    @apply rounded-xl;
+    background-image: linear-gradient(90deg, #ececec 0%, #f8f8f8 50%, #ececec 100%);
+    background-size: 600px 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
   }
   .dark .skeleton {
-    background-image: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255,255,255,0.06) 50%,
-      transparent 100%
-    );
+    background-image: linear-gradient(90deg, #1e2130 0%, #252836 50%, #1e2130 100%);
   }
 }
 
-/* ── Hide scrollbar ── */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+a, button {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}

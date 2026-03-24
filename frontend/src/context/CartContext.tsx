@@ -10,6 +10,7 @@ import {
 } from "react";
 import api from "@/lib/axios";
 import { Cart } from "@/types";
+import { isAuthenticated } from "@/lib/auth";
 
 interface CartContextValue {
   cart: Cart | null;
@@ -26,12 +27,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
+    if (!isAuthenticated()) return;
     try {
       setLoading(true);
       const { data } = await api.get<{ cart: Cart }>("/api/cart");
       setCart(data.cart);
     } catch {
-      // unauthenticated — cart stays null
+      // session expired or network error — cart stays null
     } finally {
       setLoading(false);
     }

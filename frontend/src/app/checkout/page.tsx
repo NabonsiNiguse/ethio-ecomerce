@@ -9,7 +9,7 @@ import { useCart } from "@/context/CartContext";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
-import Image from "next/image";
+import { DeliveryFeeEstimate } from "@/types";
 
 interface ShippingAddress {
   full_name: string;
@@ -20,6 +20,8 @@ interface ShippingAddress {
   state: string;
   postal_code: string;
   country: string;
+  buyer_lat: string;
+  buyer_lon: string;
 }
 
 const STEP_LABELS = ["Cart", "Shipping", "Payment"];
@@ -29,10 +31,13 @@ export default function CheckoutPage() {
   const { cart, refresh } = useCart();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"shipping" | "payment">("shipping");
+  const [feeEstimate, setFeeEstimate] = useState<DeliveryFeeEstimate | null>(null);
+  const [estimating, setEstimating] = useState(false);
 
   const [addr, setAddr] = useState<ShippingAddress>({
     full_name: "", phone: "", address_line1: "", address_line2: "",
     city: "", state: "", postal_code: "", country: "Ethiopia",
+    buyer_lat: "", buyer_lon: "",
   });
 
   const items = cart?.items ?? [];
@@ -41,6 +46,25 @@ export default function CheckoutPage() {
 
   const set = (k: keyof ShippingAddress) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setAddr((a) => ({ ...a, [k]: e.target.value }));
+
+  const estimateDeliveryFee = async () => {
+    if (!addr.buyer_lat || !addr.buyer_lon) return;
+    setEstimating(true);
+    try {
+      // Seller default location: Addis Ababa center
+      const { data } = await api.post<DeliveryFeeEstimate>("/api/delivery/estimate-fee", {
+        seller_lat: 9.0054,
+        seller_lon: 38.7636,
+        buyer_lat: parseFloat(addr.buyer_lat),
+        buyer_lon: parseFloat(addr.buyer_lon),
+      });
+      setFeeEstimate(data);
+    } catch {
+      toast.error("Could not estimate delivery fee");
+    } finally {
+      setEstimating(false);
+    }
+  };
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,6 +178,41 @@ export default function CheckoutPage() {
                     <Input label="Postal Code" value={addr.postal_code} onChange={set("postal_code")} placeholder="1000" />
                   </div>
                   <Input label="Country *" value={addr.country} onChange={set("country")} required />
+
+                  {/* Delivery fee estimator */}
+                  <div className="rounded-xl border border-dashed border-orange-300 bg-orange-50 p-4 dark:bg-orange-900/10 dark:border-orange-800">
+                    <p className="mb-3 text-sm font-bold text-orange-700 dark:text-orange-400">📍 Estimate Delivery Fee (optional)</p>
+                    <p className="mb-3 text-xs text-gray-500">Enter your GPS coordinates to get an accurate delivery fee estimate.</p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Input label="Latitude" type="number" step="any" value={addr.buyer_lat} onChange={set("buyer_lat")} placeholder="e.g. 9.0054" />
+                      <Input label="Longitude" type="number" step="any" value={addr.buyer_lon} onChange={set("buyer_lon")} placeholder="e.g. 38.7636" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={estimateDeliveryFee}
+                      disabled={estimating || !addr.buyer_lat || !addr.buyer_lon}
+                      className="mt-3 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50 transition"
+                    >
+                      {estimating ? "Estimating..." : "Calculate Fee"}
+                    </button>
+                    {feeEstimate && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-3 flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow-sm dark:bg-gray-800"
+                      >
+                        <div>
+                          <p className="text-xs text-gray-400">Distance</p>
+                          <p className="font-bold text-gray-800 dark:text-gray-100">{feeEstimate.distance_km.toFixed(1)} km</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-400">Delivery Fee</p>
+                          <p className="text-lg font-black text-orange-500">{feeEstimate.delivery_fee} ETB</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+
                   <Button type="submit" size="lg" className="w-full bg-orange-500 hover:bg-orange-600 text-white">
                     Continue to Payment →
                   </Button>
@@ -265,8 +324,12 @@ export default function CheckoutPage() {
                 <span>${total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-500">
-                <span>Shipping</span>
-                <span className="font-semibold text-green-600">Free</span>
+                <span>Delivery</span>
+                {feeEstimate ? (
+                  <span className="font-semibold text-orange-500">{feeEstimate.delivery_fee} ETB</span>
+                ) : (
+                  <span className="text-gray-400 italic">Enter location to estimate</span>
+                )}
               </div>
               <div className="flex justify-between text-sm text-gray-500">
                 <span>Tax</span>

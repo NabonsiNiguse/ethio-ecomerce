@@ -10,9 +10,10 @@ import { clearTokens, isAuthenticated } from "@/lib/auth";
 import { UserInfo, Profile, Order } from "@/types";
 import ProfileTab from "./ProfileTab";
 import OrdersTab from "./OrdersTab";
+import DeliveryTab from "./DeliveryTab";
 import { Suspense } from "react";
 
-type Tab = "overview" | "orders" | "profile";
+type Tab = "overview" | "orders" | "delivery" | "profile";
 
 function DashboardContent() {
   const router = useRouter();
@@ -57,6 +58,7 @@ function DashboardContent() {
   const NAV: { key: Tab; label: string; icon: string }[] = [
     { key: "overview", label: "Overview", icon: "🏠" },
     { key: "orders", label: "My Orders", icon: "📦" },
+    { key: "delivery", label: "Deliveries", icon: "🚚" },
     { key: "profile", label: "Profile", icon: "👤" },
   ];
 
@@ -123,6 +125,7 @@ function DashboardContent() {
               />
             )}
             {tab === "orders" && <OrdersTab orders={orders} />}
+            {tab === "delivery" && <DeliveryTab orders={orders} />}
             {tab === "profile" && <ProfileTab profile={profile} user={user} onUpdated={setProfile} />}
           </motion.div>
         </AnimatePresence>

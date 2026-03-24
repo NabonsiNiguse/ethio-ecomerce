@@ -85,3 +85,52 @@ export interface UserInfo {
   role: string;
   is_verified: boolean;
 }
+
+export interface Delivery {
+  id: number;
+  order: number;
+  status: "pending" | "assigned" | "picked" | "delivered";
+  shipping_address: string;
+  distance_km: number | null;
+  delivery_fee: number;
+  otp_verified: boolean;
+  assigned_at: string | null;
+  picked_at: string | null;
+  delivered_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DeliveryFeeEstimate {
+  distance_km: number;
+  delivery_fee: number;
+  currency: string;
+}
+
+export interface ChatMessage {
+  id?: number;
+  // New schema fields
+  content?: string;
+  msg_type?: "text" | "delivery_update" | "system";
+  is_deleted?: boolean;
+  edited_at?: string | null;
+  created_at?: string;
+  // Legacy / WS broadcast fields (kept for compatibility)
+  message?: string;
+  sender_id: number;
+  sender_username: string;
+  timestamp?: string;
+  is_read?: boolean;
+}
+
+export interface Conversation {
+  id: number;
+  conversation_type: "support" | "buyer_seller" | "order_linked";
+  order: number | null;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  participants: { user: number; username: string; role: string; joined_at: string }[];
+  unread_count: number;
+  last_message: { id: number; content: string; sender_id: number; created_at: string } | null;
+}

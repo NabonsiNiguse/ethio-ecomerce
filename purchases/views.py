@@ -214,9 +214,21 @@ class CheckoutAPIView(APIView):
                 .get(pk=order.pk)
             )
 
+        # Inject system message into any order-linked chat conversation
+        try:
+            from chat.views import inject_order_system_message
+            inject_order_system_message(order.id, f'🛒 Order #{order.id} has been placed successfully.')
+        except Exception:
+            pass
+
         return Response({"message": "Checkout successful", "order": OrderSerializer(order_refresh).data}, status=status.HTTP_201_CREATED)
 
-
+        # Inject system message into any order-linked chat conversation
+        try:
+            from chat.views import inject_order_system_message
+            inject_order_system_message(order.id, f'🛒 Order #{order.id} has been placed successfully.')
+        except Exception:
+            pass
 class OrderListAPIView(APIView):
     """
     GET /api/orders/
