@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,6 +18,9 @@ export default function CartPage() {
   const { cart, loading, removeItem, refresh } = useCart();
   const [removing, setRemoving] = useState<number | null>(null);
   const [updating, setUpdating] = useState<number | null>(null);
+  const [authed, setAuthed] = useState(true); // optimistic: assume authed to avoid flash
+
+  useEffect(() => { setAuthed(isAuthenticated()); }, []);
 
   const handleRemove = async (productId: number) => {
     setRemoving(productId);
@@ -59,7 +62,7 @@ export default function CartPage() {
 
   if (loading) return <CartSkeleton />;
 
-  if (!isAuthenticated()) {
+  if (!authed) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-16 text-center">
         <div className="flex flex-col items-center gap-4">

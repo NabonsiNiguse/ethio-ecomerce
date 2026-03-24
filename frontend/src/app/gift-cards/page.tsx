@@ -87,11 +87,13 @@ const AMOUNTS = ["$25", "$50", "$100", "$200", "Custom"];
 
 export default function GiftCardShopPage() {
   const { addItem } = useCart();
-  const [authed] = useState(() => isAuthenticated());
+  const [authed, setAuthed] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState("$50");
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [addingId, setAddingId] = useState<number | null>(null);
+
+  useEffect(() => { setAuthed(isAuthenticated()); }, []);
 
   // Fetch real products from backend
   useEffect(() => {

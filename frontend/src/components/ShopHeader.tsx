@@ -110,14 +110,18 @@ export default function ShopHeader() {
   const itemCount  = cart?.items?.reduce((s, i) => s + i.quantity, 0) ?? 0;
   const categories = useCategories();
   const { theme, toggle: toggleTheme } = useTheme();
-  const isDark = theme === "dark";
 
+  const [mounted,      setMounted]      = useState(false);
   const [authed,       setAuthed]       = useState(false);
   const [username,     setUsername]     = useState("");
   const [showMenu,     setShowMenu]     = useState(false);
   const [showDrawer,   setShowDrawer]   = useState(false);
   const [search,       setSearch]       = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const isDark = mounted && theme === "dark";
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const auth = isAuthenticated();

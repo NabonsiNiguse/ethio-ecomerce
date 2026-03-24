@@ -36,9 +36,12 @@ export default function HomePage() {
   const [username, setUsername] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading,  setLoading]  = useState(true);
+  const [mounted,  setMounted]  = useState(false);
   const { addItem } = useCart();
   const { toggle, has } = useWishlist();
   const [addingId, setAddingId] = useState<number | null>(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const auth = isAuthenticated();
@@ -69,7 +72,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#f7f8fa] dark:bg-[#0f1117]">
 
       {/* ── Welcome bar ── */}
-      {authed && username && (
+      {mounted && authed && username && (
         <div className="bg-brand-600 px-4 py-2 text-center text-[13px] font-medium text-white">
           Welcome back, <span className="font-bold">{username}</span>!
           <Link href="/dashboard" className="ml-3 rounded-full bg-white/20 px-3 py-0.5 text-xs font-bold hover:bg-white/30 transition">
@@ -105,7 +108,7 @@ export default function HomePage() {
                   Shop Now
                 </motion.button>
               </Link>
-              {!authed && (
+              {mounted && !authed && (
                 <Link href="/auth/register">
                   <motion.button
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
@@ -178,7 +181,7 @@ export default function HomePage() {
         </section>
 
         {/* ── Guest CTA ── */}
-        {!authed && (
+        {mounted && !authed && (
           <section className="overflow-hidden rounded-3xl bg-gradient-to-r from-brand-600 to-teal-500 px-8 py-12 text-center text-white shadow-lg">
             <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-col items-center gap-4">
               <p className="text-3xl font-extrabold">Get exclusive deals</p>
@@ -198,8 +201,8 @@ export default function HomePage() {
         {/* ── Best Sellers ── */}
         <section>
           <SectionHeader
-            title={authed ? "Recommended for You" : "Best Sellers"}
-            subtitle={authed ? "Based on popular picks" : "Our most loved products"}
+            title={mounted && authed ? "Recommended for You" : "Best Sellers"}
+            subtitle={mounted && authed ? "Based on popular picks" : "Our most loved products"}
             href="/products"
           />
           <ProductGrid products={bestSellers} loading={loading} />
@@ -212,7 +215,7 @@ export default function HomePage() {
         </section>
 
         {/* ── Auth quick links ── */}
-        {authed && (
+        {mounted && authed && (
           <section>
             <h2 className="mb-5 text-[18px] font-bold text-gray-900 dark:text-gray-100">Quick Access</h2>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
