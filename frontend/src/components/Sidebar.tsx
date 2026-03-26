@@ -5,6 +5,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCategories, Category } from "@/context/CategoriesContext";
+import { useUser } from "@/context/UserContext";
 
 const CAT_ICONS: Record<string, string> = {
   Electronics:        "💻",
@@ -44,6 +45,76 @@ const NAV_ITEMS = [
   { Icon: IconBox,   label: "My Orders",    href: "/dashboard" },
   { Icon: IconUser,  label: "Profile",      href: "/dashboard" },
 ];
+
+// ── Seller nav items ──────────────────────────────────────────────────────────
+const SELLER_NAV = [
+  { Icon: IconHome,  label: "Overview",         href: "/seller/dashboard" },
+  { Icon: IconBox,   label: "My Products",       href: "/seller/dashboard?tab=products" },
+  { Icon: IconCart,  label: "Order Management",  href: "/seller/dashboard?tab=orders" },
+  { Icon: IconUser,  label: "Shop Settings",     href: "/seller/dashboard?tab=settings" },
+  { Icon: IconGrid,  label: "Payouts",           href: "/seller/dashboard?tab=payouts" },
+];
+
+function SellerSidebarBody({ pathname, onClose }: { pathname: string; onClose?: () => void }) {
+  const { user } = useUser();
+  const isActive = (href: string) => pathname.startsWith(href.split("?")[0]);
+  const navItem = (active: boolean) => `
+    relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all
+    ${active
+      ? "bg-[#FFEDD5] dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 font-semibold"
+      : "text-gray-700 dark:text-gray-300 hover:bg-[#FFF7ED] dark:hover:bg-orange-900/20 hover:text-orange-600 dark:hover:text-orange-400"
+    }
+  `;
+  const accentBar = "absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-orange-500";
+
+  return (
+    <div className="flex flex-col h-full overflow-y-auto py-5">
+      {/* Seller badge */}
+      <div className="mx-3 mb-4 rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 p-3 text-white">
+        <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">Seller Panel</p>
+        <p className="text-sm font-bold mt-0.5">{user.username}</p>
+      </div>
+
+      <div className="px-3">
+        <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">Seller Menu</p>
+        <nav className="space-y-0.5">
+          {SELLER_NAV.map(({ Icon, label, href }) => {
+            const active = isActive(href);
+            return (
+              <Link key={label} href={href} onClick={onClose} className={navItem(active)}>
+                {active && <span className={accentBar} />}
+                <span className={`flex-shrink-0 ${active ? "text-orange-500" : "text-gray-400"}`}><Icon /></span>
+                <span className="flex-1">{label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      <div className="mx-3 my-4 h-px bg-gray-200 dark:bg-white/[0.08]" />
+
+      <div className="px-3">
+        <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">Marketplace</p>
+        <nav className="space-y-0.5">
+          {[
+            { Icon: IconHome,  label: "Home",         href: "/" },
+            { Icon: IconGrid,  label: "All Products", href: "/products" },
+            { Icon: IconCart,  label: "My Cart",      href: "/cart" },
+          ].map(({ Icon, label, href }) => {
+            const active = pathname === href;
+            return (
+              <Link key={label} href={href} onClick={onClose} className={navItem(active)}>
+                {active && <span className={accentBar} />}
+                <span className={`flex-shrink-0 ${active ? "text-orange-500" : "text-gray-400"}`}><Icon /></span>
+                <span className="flex-1">{label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </div>
+  );
+}
 
 function SidebarBody({ pathname, categories, onClose }: {
   pathname: string;
@@ -217,14 +288,24 @@ function SidebarBody({ pathname, categories, onClose }: {
 export default function Sidebar() {
   const pathname   = usePathname();
   const categories = useCategories();
+  const { isSeller } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Don't render the global sidebar on dashboard pages that have their own sidebar
+  const isDashboardPage = pathname.startsWith("/seller/dashboard") ||
+                          pathname.startsWith("/admin/dashboard") ||
+                          pathname.startsWith("/rider");
+  if (isDashboardPage) return null;
 
   return (
     <>
-      {/* Desktop sidebar — NO inline styles, all Tailwind */}
+      {/* Desktop sidebar */}
       <aside className="fixed left-0 z-30 hidden w-[var(--sidebar-w)] overflow-hidden lg:flex flex-col bg-white dark:bg-[#16181f] border-r border-gray-200 dark:border-white/[0.08] shadow-[2px_0_8px_rgba(0,0,0,0.04)] dark:shadow-[2px_0_8px_rgba(0,0,0,0.3)]"
         style={{ top: "var(--header-h)", height: "calc(100vh - var(--header-h))" }}>
-        <SidebarBody pathname={pathname} categories={categories} />
+        {isSeller
+          ? <SellerSidebarBody pathname={pathname} />
+          : <SidebarBody pathname={pathname} categories={categories} />
+        }
       </aside>
 
       {/* Mobile FAB */}
@@ -262,7 +343,10 @@ export default function Sidebar() {
                 </button>
               </div>
               <div className="h-[calc(100%-60px)] overflow-y-auto">
-                <SidebarBody pathname={pathname} categories={categories} onClose={() => setMobileOpen(false)} />
+                {isSeller
+                  ? <SellerSidebarBody pathname={pathname} onClose={() => setMobileOpen(false)} />
+                  : <SidebarBody pathname={pathname} categories={categories} onClose={() => setMobileOpen(false)} />
+                }
               </div>
             </motion.aside>
           </>

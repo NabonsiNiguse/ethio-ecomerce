@@ -278,6 +278,8 @@ export default function ShopHeader() {
                           { icon: "🛒", label: "My Cart",    href: "/cart" },
                           { icon: "❤️", label: "Wishlist",   href: "/wishlist", badge: wishlistCount },
                           { icon: "🎁", label: "Gift Cards", href: "/gift-cards" },
+                          { icon: "🏪", label: "Seller Dashboard", href: "/seller/dashboard" },
+                          { icon: "🔧", label: "Admin Panel", href: "/admin/dashboard" },
                         ].map(item => (
                           <Link key={item.label} href={item.href} onClick={() => setShowMenu(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-brand-700 dark:hover:text-brand-400 transition">
@@ -354,6 +356,15 @@ export default function ShopHeader() {
                 </Link>
               );
             })}
+            {/* Become a Seller — opens in new tab */}
+            <a
+              href="/auth/seller-register"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto flex-shrink-0 flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-rose-500 px-4 py-1.5 text-[13px] font-bold text-white whitespace-nowrap hover:from-orange-400 hover:to-rose-400 transition shadow-md shadow-orange-500/20"
+            >
+              🏪 Become a Seller
+            </a>
           </div>
         </nav>
       </header>
@@ -425,6 +436,11 @@ export default function ShopHeader() {
                       className="block w-full rounded-xl border border-gray-200 dark:border-white/10 py-2.5 text-center text-[13px] font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 transition">
                       Create Account
                     </Link>
+                    <a href="/auth/seller-register" target="_blank" rel="noopener noreferrer"
+                      onClick={() => setShowDrawer(false)}
+                      className="block w-full rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 py-2.5 text-center text-[13px] font-bold text-white hover:from-orange-400 hover:to-rose-400 transition">
+                      🏪 Become a Seller
+                    </a>
                   </div>
                 )}
               </div>

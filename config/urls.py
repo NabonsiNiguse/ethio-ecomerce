@@ -30,6 +30,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),
     path('api/users/', include('accounts.users_urls')),
+    path('api/admin/', include('accounts.admin_urls')),
+    path('api/seller/', include('catalog.seller_urls')),
     path('api/admin/dashboard', AdminDashboardAPIView.as_view(), name='admin-dashboard'),
     path('api/', include('catalog.urls')),
     path('api/', include('purchases.urls')),

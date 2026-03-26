@@ -12,8 +12,23 @@ User = get_user_model()
 
 def issue_jwt_tokens_for_user(user: User) -> dict:
     refresh = RefreshToken.for_user(user)
+    # Embed key claims so the frontend can read role/username without an extra API call
+    access = refresh.access_token
+    access["username"]   = user.username
+    access["email"]      = user.email
+    access["role"]       = user.role
+    access["is_verified"] = user.is_verified
+    try:
+        sp = user.seller_profile
+        access["seller_approved"]  = sp.is_approved
+        access["onboarding_step"]  = sp.onboarding_step
+        access["store_name"]       = sp.store_name
+    except Exception:
+        access["seller_approved"] = False
+        access["onboarding_step"] = 1
+        access["store_name"]      = ""
     return {
-        "access": str(refresh.access_token),
+        "access": str(access),
         "refresh": str(refresh),
     }
 

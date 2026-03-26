@@ -4,6 +4,14 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load .env — try project root first, then current working directory
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / ".env", override=True)
+    load_dotenv(override=False)  # fallback: cwd/.env
+except ImportError:
+    pass  # python-dotenv not installed — rely on OS env vars
+
 SECRET_KEY = 'django-insecure-6h^))5xg!d9@0)@r9!2oaenwc1-)fi#+6p19sa&-da)u0(-swo'
 
 DEBUG = True
@@ -127,8 +135,10 @@ REST_FRAMEWORK = {
         'user': '5000/hour',
         'auth_login': '20/min',
         'auth_otp': '20/min',
+        'otp_send': '3/min',
     },
 }
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv("JWT_ACCESS_MINUTES", "60"))),
@@ -162,3 +172,19 @@ else:
 
 # ── Chapa Payment ─────────────────────────────────────────────────────────────
 CHAPA_SECRET_KEY = os.getenv("CHAPA_SECRET_KEY", None)
+
+# ── Email / SMTP (Gmail) ──────────────────────────────────────────────────────
+EMAIL_BACKEND       = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST          = "smtp.gmail.com"
+EMAIL_PORT          = 587
+EMAIL_USE_TLS       = True
+EMAIL_HOST_USER     = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL  = os.getenv("EMAIL_HOST_USER", "")
+
+# Debug — printed once at startup so you can confirm values loaded
+if DEBUG:
+    import sys
+    _u = EMAIL_HOST_USER or "(empty — check .env)"
+    _p = f"{'*' * len(EMAIL_HOST_PASSWORD)} ({len(EMAIL_HOST_PASSWORD)} chars)" if EMAIL_HOST_PASSWORD else "(empty — check .env)"
+    print(f"[EMAIL] HOST_USER={_u}  PASSWORD={_p}", file=sys.stderr)

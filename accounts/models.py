@@ -10,11 +10,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 def normalize_phone_number(phone_number: str) -> str:
-    """
-    Basic normalization:
-    - keep digits
-    - drop leading '+' if present
-    """
     digits = "".join(ch for ch in (phone_number or "") if ch.isdigit())
     return digits
 
@@ -26,15 +21,12 @@ class User(AbstractUser):
         customer = "customer", _("customer")
 
     id = models.BigAutoField(primary_key=True)
-
-    # Ensure email is globally unique.
     email = models.EmailField(_("email address"), unique=True)
     phone_number = models.CharField(max_length=20, unique=True)
     role = models.CharField(max_length=20, choices=Roles.choices, default=Roles.customer)
     is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        # Normalize phone consistently for uniqueness lookups.
         if self.phone_number:
             self.phone_number = normalize_phone_number(self.phone_number)
         return super().save(*args, **kwargs)
@@ -45,29 +37,30 @@ class User(AbstractUser):
 
 class OTPVerification(models.Model):
     """
-    OTP verification for phone-based login.
-    Stores only a hashed OTP (code), never the plain value.
+    Hashed OTP — 3 min TTL, max 3 verify attempts, is_used flag prevents reuse.
     """
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="otp_verifications")
     phone_number = models.CharField(max_length=20, db_index=True)
     otp_hash = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     attempts = models.PositiveIntegerField(default=0)
+    is_used = models.BooleanField(default=False)
 
-    OTP_TTL_MINUTES = 10
-    MAX_ATTEMPTS = 5
+    OTP_TTL_MINUTES = 3      # expires in 3 minutes
+    MAX_ATTEMPTS = 3         # max 3 wrong guesses
 
     def is_expired(self) -> bool:
-        return timezone.now() >= self.expires_at
+        return timezone.now() >= self.expires_at or self.is_used
 
     @staticmethod
     def generate_otp_code() -> str:
         return f"{secrets.randbelow(1_000_000):06d}"
 
     @classmethod
-    def create_for_user(cls, *, user: settings.AUTH_USER_MODEL, phone_number: str) -> tuple["OTPVerification", str]:
+    def create_for_user(cls, *, user, phone_number: str) -> tuple["OTPVerification", str]:
+        # Invalidate all previous OTPs for this phone
+        cls.objects.filter(user=user, phone_number=normalize_phone_number(phone_number)).update(is_used=True)
         otp_code = cls.generate_otp_code()
         otp_obj = cls.objects.create(
             user=user,
@@ -87,15 +80,7 @@ class OTPVerification(models.Model):
 
 
 class Profile(models.Model):
-    """
-    User profile information.
-
-    Linked OneToOne with the custom User model.
-    """
-
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
-
-    # Store an image URL (or data URL) to avoid requiring Pillow for ImageField.
     profile_image = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=120, null=True, blank=True)
@@ -103,3 +88,41 @@ class Profile(models.Model):
 
     def __str__(self) -> str:
         return f"Profile({self.user_id})"
+
+
+class SellerProfile(models.Model):
+    """
+    Extended seller onboarding data — filled in 4 steps.
+    """
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="seller_profile"
+    )
+    # Step 1
+    full_name = models.CharField(max_length=200, blank=True, default="")
+    # Step 2
+    store_name = models.CharField(max_length=200, blank=True, default="")
+    business_license_number = models.CharField(max_length=100, blank=True, default="")
+    business_city = models.CharField(max_length=120, blank=True, default="")
+    business_region = models.CharField(max_length=120, blank=True, default="")
+    business_country = models.CharField(max_length=100, blank=True, default="Ethiopia")
+    # Step 3
+    document_url = models.URLField(blank=True, default="")
+    document_type = models.CharField(
+        max_length=20,
+        choices=[("license", "Business License"), ("gov_id", "Government ID")],
+        blank=True, default="",
+    )
+    # Step 4
+    bank_name = models.CharField(max_length=100, blank=True, default="")
+    bank_account_holder = models.CharField(max_length=200, blank=True, default="")
+    bank_account_number = models.CharField(max_length=50, blank=True, default="")
+    mobile_money_number = models.CharField(max_length=20, blank=True, default="")
+    # Status
+    onboarding_step = models.PositiveSmallIntegerField(default=1)
+    is_approved = models.BooleanField(default=False)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"SellerProfile({self.user_id}, step={self.onboarding_step})"

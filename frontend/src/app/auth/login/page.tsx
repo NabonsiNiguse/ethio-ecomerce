@@ -41,7 +41,10 @@ export default function LoginPage() {
       });
       setTokens(data.access, data.refresh);
       toast.success("Welcome back!");
-      router.push("/products");
+      const role = data.user?.role;
+      if (role === "seller") router.push("/seller/dashboard");
+      else if (role === "admin") router.push("/admin/dashboard");
+      else router.push("/");
     } catch (err: unknown) {
       const response = (err as { response?: { status?: number; data?: { detail?: string } } })?.response;
       const msg = response?.data?.detail ?? "Invalid credentials.";
