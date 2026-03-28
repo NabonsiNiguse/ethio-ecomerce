@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'payments',
     'logistics',
     'chat',
+    'ai_engine',
 ]
 
 MIDDLEWARE = [
@@ -172,6 +173,9 @@ else:
 
 # ── Chapa Payment ─────────────────────────────────────────────────────────────
 CHAPA_SECRET_KEY = os.getenv("CHAPA_SECRET_KEY", None)
+
+# ── OpenAI ────────────────────────────────────────────────────────────────────
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 # ── Email / SMTP (Gmail) ──────────────────────────────────────────────────────
 EMAIL_BACKEND       = "django.core.mail.backends.smtp.EmailBackend"

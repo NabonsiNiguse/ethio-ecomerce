@@ -9,6 +9,7 @@ from .views import (
     DeliveryStatusUpdateAPIView,
     MyDeliveriesAPIView,
 )
+from .tracking_views import DeliveryTrackingAPIView, RiderTrackingAPIView
 
 urlpatterns = [
     # Feature 1.1 — Geofence pricing
@@ -24,6 +25,10 @@ urlpatterns = [
 
     # Buyer: get delivery info for a specific order
     path("delivery/order/<int:order_id>", DeliveryByOrderAPIView.as_view(), name="delivery-by-order"),
+
+    # Live tracking
+    path("delivery/order/<int:order_id>/tracking", DeliveryTrackingAPIView.as_view(), name="delivery-tracking"),
+    path("delivery/<int:delivery_id>/rider-location", RiderTrackingAPIView.as_view(), name="rider-location"),
 
     # Rider: get their assigned deliveries
     path("delivery/my-deliveries", MyDeliveriesAPIView.as_view(), name="my-deliveries"),

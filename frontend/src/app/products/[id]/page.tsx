@@ -16,6 +16,7 @@ import { StarRating } from "@/components/ProductCard";
 import ProductCard from "@/components/ProductCard";
 import { startConversation } from "@/lib/chat";
 import { isAuthenticated } from "@/lib/auth";
+import AIRecommendations from "@/components/AIRecommendations";
 
 // Mock reviews — replace with real API when available
 const MOCK_REVIEWS = [
@@ -453,6 +454,13 @@ export default function ProductDetailPage() {
           </div>
         </section>
       )}
+
+      {/* ── AI Recommendations ── */}
+      <AIRecommendations
+        productId={product.id}
+        title="You Might Also Like"
+        subtitle="AI-powered picks based on this product"
+      />
     </main>
   );
 }

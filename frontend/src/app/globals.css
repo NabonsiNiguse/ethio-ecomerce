@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,8 +6,12 @@
 
 /* ── CSS variables ── */
 :root {
-  --header-h: 118px; /* 70px top + 48px subnav */
+  --header-h: 118px;
   --sidebar-w: 260px;
+  --radius: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -15,9 +19,10 @@ html, body { margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02","cv03","cv04","cv11";
 }
 
 /* ── Shimmer skeleton ── */
@@ -26,7 +31,6 @@ body {
   100% { background-position:  600px 0; }
 }
 
-/* ── Chat product banner shimmer ── */
 @keyframes chatShimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
@@ -43,7 +47,17 @@ body {
   50%       { opacity: 1; }
 }
 
-/* Product banner in chat — animated water-blue */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2);   opacity: 0; }
+}
+
+/* Product banner in chat */
 .product-banner-bg {
   background: linear-gradient(135deg, #0c4a6e, #0369a1, #0284c7, #0ea5e9, #38bdf8, #0ea5e9, #0284c7, #0369a1);
   background-size: 300% 300%;
@@ -75,19 +89,83 @@ body {
   .dark .skeleton {
     background-image: linear-gradient(90deg, #1e2130 0%, #252836 50%, #1e2130 100%);
   }
+
+  /* Premium card */
+  .card-premium {
+    @apply rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .card-premium:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl dark:bg-gray-900/80;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-600 to-teal-500 bg-clip-text text-transparent;
+  }
+
+  /* Premium button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition-all dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700;
+  }
+
+  /* Status badges */
+  .badge-pending   { @apply rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-semibold text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400; }
+  .badge-paid      { @apply rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400; }
+  .badge-shipped   { @apply rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-semibold text-purple-700 dark:bg-purple-900/30 dark:text-purple-400; }
+  .badge-delivered { @apply rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400; }
+  .badge-cancelled { @apply rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-600 dark:bg-red-900/30 dark:text-red-400; }
+
+  /* Fade-up animation */
+  .animate-fade-up { animation: fadeUp 0.4s ease both; }
+
+  /* Scrollbar */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { @apply rounded-full bg-gray-200 dark:bg-gray-700; }
 }
 
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
+/* Focus ring */
 :focus-visible {
   outline: 2px solid #0f766e;
   outline-offset: 2px;
   border-radius: 6px;
 }
 
+/* Smooth transitions on interactive elements */
 a, button {
   transition-property: color, background-color, border-color, box-shadow, transform, opacity;
-  transition-duration: 200ms;
-  transition-timing-function: ease;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Premium input */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="search"],
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(15, 118, 110, 0.2);
+  color: inherit;
 }

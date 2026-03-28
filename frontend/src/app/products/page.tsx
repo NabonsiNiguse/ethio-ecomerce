@@ -7,7 +7,6 @@ import ProductCard from "@/components/ProductCard";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 import { Product, PaginatedResponse } from "@/types";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const SKELETON_COUNT = 8;
 
 type SortKey = "default" | "price_asc" | "price_desc" | "name_asc";
@@ -22,16 +21,29 @@ interface Filters {
   inStock: boolean;
 }
 
-async function fetchProducts(filters: Filters): Promise<Product[]> {
+async function fetchProducts(filters: Filters): Promise<{ products: Product[]; corrected?: string | null }> {
+  const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  // Use AI search when there's a text query
+  if (filters.search && filters.search.trim().length > 1) {
+    const params = new URLSearchParams({ q: filters.search, limit: "50" });
+    if (filters.minPrice) params.set("price_min", filters.minPrice);
+    if (filters.maxPrice) params.set("price_max", filters.maxPrice);
+    if (filters.category) params.set("category", filters.category);
+    if (filters.inStock)  params.set("in_stock", "true");
+    const res = await fetch(`${BASE}/api/ai/search?${params}`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return { products: data.results ?? [], corrected: data.corrected_query };
+  }
+  // Standard listing
   const params = new URLSearchParams({ page_size: "100" });
-  if (filters.search)   params.set("search", filters.search);
   if (filters.category) params.set("category_name", filters.category);
   if (filters.maxPrice) params.set("price_max", filters.maxPrice);
   if (filters.minPrice) params.set("price_min", filters.minPrice);
   const res = await fetch(`${BASE}/api/products/?${params}`, { cache: "no-store" });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data: PaginatedResponse<Product> = await res.json();
-  return data.results ?? [];
+  return { products: data.results ?? [], corrected: null };
 }
 
 function sortProducts(products: Product[], sort: SortKey): Product[] {
@@ -82,7 +94,7 @@ function ProductsContent() {
     let cancelled = false;
     setLoading(true);
     fetchProducts(filters)
-      .then(r => { if (!cancelled) setProducts(r.length ? r : SAMPLE_PRODUCTS); })
+      .then(r => { if (!cancelled) setProducts(r.products.length ? r.products : SAMPLE_PRODUCTS); })
       .catch(() => { if (!cancelled) setProducts(SAMPLE_PRODUCTS); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };

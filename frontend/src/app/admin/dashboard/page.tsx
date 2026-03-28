@@ -9,8 +9,9 @@ import AdminUsers from "./AdminUsers";
 import AdminProducts from "./AdminProducts";
 import AdminOrders from "./AdminOrders";
 import AdminPayments from "./AdminPayments";
+import AdminAI from "./AdminAI";
 
-type Tab = "overview" | "users" | "products" | "orders" | "payments";
+type Tab = "overview" | "users" | "products" | "orders" | "payments" | "ai";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -34,6 +35,7 @@ export default function AdminDashboard() {
     { key: "products",  icon: "📦", label: "Products" },
     { key: "orders",    icon: "🛒", label: "Orders" },
     { key: "payments",  icon: "💳", label: "Payments" },
+    { key: "ai",        icon: "🤖", label: "AI Center" },
   ];
 
   return (
@@ -70,6 +72,7 @@ export default function AdminDashboard() {
             {tab === "products"  && <AdminProducts />}
             {tab === "orders"    && <AdminOrders />}
             {tab === "payments"  && <AdminPayments />}
+            {tab === "ai"        && <AdminAI />}
           </motion.div>
         </AnimatePresence>
       </main>

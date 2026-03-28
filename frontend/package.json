@@ -8,9 +8,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@types/leaflet": "^1.9.21",
     "axios": "^1.7.2",
     "framer-motion": "^11.2.10",
     "js-cookie": "^3.0.5",
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.7.0",
     "next": "14.2.3",
     "react": "^18",

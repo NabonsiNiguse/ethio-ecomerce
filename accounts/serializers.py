@@ -142,26 +142,38 @@ class VerifyOTPSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    phone_number = serializers.CharField(max_length=20)
-    password = serializers.CharField(write_only=True)
+    # Accept phone_number OR email — whichever the user provides
+    phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    email        = serializers.EmailField(required=False, allow_blank=True)
+    password     = serializers.CharField(write_only=True)
 
     def validate_phone_number(self, value: str) -> str:
+        if not value:
+            return value
         normalized = normalize_phone_number(value)
         if not normalized:
             raise serializers.ValidationError("Invalid phone number.")
         return normalized
 
     def validate(self, attrs):
-        phone_number = attrs["phone_number"]
-        password = attrs["password"]
+        phone_number = attrs.get("phone_number", "").strip()
+        email        = attrs.get("email", "").strip()
+        password     = attrs["password"]
 
-        try:
-            user = User.objects.get(phone_number=phone_number)
-        except User.DoesNotExist:
+        if not phone_number and not email:
+            raise serializers.ValidationError({"phone_number": "Phone number or email is required."})
+
+        # Look up user by phone OR email
+        user = None
+        if phone_number:
+            user = User.objects.filter(phone_number=phone_number).first()
+        if not user and email:
+            user = User.objects.filter(email__iexact=email).first()
+
+        if not user:
             raise serializers.ValidationError({"phone_number": "Invalid credentials."})
 
         if not user.is_verified:
-            # Keep message clean and consistent.
             raise serializers.ValidationError({"non_field_errors": "OTP verification required."})
 
         if not check_password(password, user.password):

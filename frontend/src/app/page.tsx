@@ -12,6 +12,7 @@ import { Product, PaginatedResponse } from "@/types";
 import ProductCard from "@/components/ProductCard";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 import toast from "react-hot-toast";
+import AIRecommendations from "@/components/AIRecommendations";
 
 const CATEGORIES = [
   { icon: "💻", label: "Electronics",    href: "/products?category_name=Electronics" },
@@ -213,6 +214,12 @@ export default function HomePage() {
           <SectionHeader title="Trending Now" subtitle="What everyone is buying" href="/products" />
           <ProductGrid products={trending} loading={loading} />
         </section>
+
+        {/* ── AI Recommendations ── */}
+        <AIRecommendations
+          title="AI Picks for You"
+          subtitle="Personalized recommendations powered by AI"
+        />
 
         {/* ── Auth quick links ── */}
         {mounted && authed && (

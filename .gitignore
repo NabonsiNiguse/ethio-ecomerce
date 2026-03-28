@@ -65,3 +65,10 @@ logs/
 *.tmp
 *.orig
 .cache/
+
+# ── Sensitive / test scripts (never commit these) ─────────────────────────────
+test_openai.py
+test_openai2.py
+fix_phones.py
+setup_accounts.py
+setup_accounts_standalone.py

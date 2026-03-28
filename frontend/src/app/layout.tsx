@@ -8,6 +8,7 @@ import { CategoriesProvider } from "@/context/CategoriesContext";
 import ShopHeader from "@/components/ShopHeader";
 import Sidebar from "@/components/Sidebar";
 import ConditionalLayout from "@/components/ConditionalLayout";
+import AIAssistant from "@/components/AIAssistant";
 
 export const metadata: Metadata = {
   title: "Ethio eCommerce — Powered by STEM Engineering",
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   {children}
                 </ConditionalLayout>
               </div>
+              <AIAssistant />
             </CategoriesProvider>
             </UserProvider>
           </WishlistProvider>

@@ -163,6 +163,14 @@ function SidebarBody({ pathname, categories, onClose }: {
               </Link>
             );
           })}
+          {/* AI Shopper special link */}
+          <Link href="/ai-shopper" onClick={onClose}
+            className={navItem(pathname === "/ai-shopper")}>
+            {pathname === "/ai-shopper" && <span className={accentBar} />}
+            <span className={`flex-shrink-0 text-[15px] ${pathname === "/ai-shopper" ? "" : ""}`}>🤖</span>
+            <span className="flex-1">AI Shopper</span>
+            <span className="rounded-full bg-violet-100 px-1.5 py-0.5 text-[9px] font-bold text-violet-600 dark:bg-violet-900/30 dark:text-violet-400">AI</span>
+          </Link>
         </nav>
       </div>
 

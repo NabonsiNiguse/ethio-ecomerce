@@ -4,6 +4,8 @@ All endpoints require role='seller'.
 """
 from decimal import Decimal
 
+from datetime import timedelta
+
 from django.db.models import Count, Sum, Q
 from django.db.models.functions import Coalesce, TruncMonth
 from django.db import models as db_models
@@ -58,7 +60,7 @@ class SellerAnalyticsAPIView(APIView):
             OrderItem.objects.filter(
                 product_id__in=product_ids,
                 order__status__in=["paid", "shipped", "delivered"],
-                order__created_at__gte=timezone.now() - timezone.timedelta(days=180),
+                order__created_at__gte=timezone.now() - timedelta(days=180),
             )
             .annotate(month=TruncMonth("order__created_at"))
             .values("month")

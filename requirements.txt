@@ -1,0 +1,79 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Ethio eCommerce — Python Backend Requirements
+# Django + DRF + Channels + AI Engine
+#
+# Install:  pip install -r requirements.txt
+# Python:   3.10+
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Core Django ───────────────────────────────────────────────────────────────
+Django==6.0.3
+djangorestframework==3.17.0
+
+# ── Authentication & JWT ──────────────────────────────────────────────────────
+djangorestframework-simplejwt==5.5.1
+
+# ── CORS ──────────────────────────────────────────────────────────────────────
+django-cors-headers==4.7.0
+
+# ── WebSockets / Real-time (chat + rider dispatch) ───────────────────────────
+channels==4.3.2
+daphne==4.2.1
+
+# ── Redis channel layer (production WebSocket scaling) ───────────────────────
+# Uncomment when REDIS_URL is set in .env:
+# channels-redis>=4.2,<5.0
+
+# ── Database ──────────────────────────────────────────────────────────────────
+# SQLite — default, no driver needed.
+# MySQL/MariaDB — uncomment when DB_HOST is set in .env:
+# mysqlclient>=2.2,<3.0
+
+# ── Environment variables ─────────────────────────────────────────────────────
+python-dotenv==1.2.2
+
+# ── HTTP clients ──────────────────────────────────────────────────────────────
+requests==2.32.5
+httpx==0.28.1
+
+# ── OpenAI (AI chatbot, personal shopper, seller AI, vision) ─────────────────
+openai==2.30.0
+
+# ── Async / ASGI internals ────────────────────────────────────────────────────
+anyio==4.13.0
+sniffio==1.3.1
+h11==0.16.0
+httpcore==1.0.9
+
+# ── Twisted (required by daphne) ─────────────────────────────────────────────
+Twisted==25.5.0
+autobahn==24.4.2
+txaio==25.12.2
+service-identity==24.2.0
+pyOpenSSL==26.0.0
+zope.interface==8.2
+hyperlink==21.0.0
+incremental==24.11.0
+constantly==23.10.4
+automat==25.4.16
+attrs==26.1.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+Pillow==11.1.0
+python-dateutil==2.9.0.post0
+pytz==2025.2
+sqlparse==0.5.5
+typing_extensions==4.15.0
+pydantic==2.12.5
+pydantic-core==2.41.5
+
+# ── Cloudinary (optional — seller document uploads) ──────────────────────────
+# Uncomment if CLOUDINARY_URL is set in .env:
+# cloudinary>=1.36,<2.0
+
+# ── Production ASGI server (alternative to daphne) ───────────────────────────
+# uvicorn[standard]>=0.29,<1.0
+
+# ── Development / Testing ─────────────────────────────────────────────────────
+# pytest>=8.0,<9.0
+# pytest-django>=4.8,<5.0

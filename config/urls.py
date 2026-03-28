@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from accounts.dashboard_views import AdminDashboardAPIView
+from accounts.notification_views import NotificationListView, NotificationMarkAllReadView, NotificationMarkReadView
 
 # ── Admin site branding ───────────────────────────────────────────────────────
 admin.site.site_header  = "Ethio eCommerce Admin"
@@ -38,6 +39,10 @@ urlpatterns = [
     path('api/', include('payments.urls')),
     path('api/', include('logistics.urls')),
     path('api/', include('chat.urls')),
+    path('api/', include('ai_engine.urls')),
+    path('api/notifications/', NotificationListView.as_view(), name='notifications'),
+    path('api/notifications/mark-all-read/', NotificationMarkAllReadView.as_view(), name='notifications-mark-all'),
+    path('api/notifications/<int:pk>/', NotificationMarkReadView.as_view(), name='notification-mark-read'),
 ]
 
 if settings.DEBUG:
